@@ -25,7 +25,7 @@ router.get("/all-books", async (req, res) => {
       soorrt._id = -1;
     }
 
-    const books = await booksAllll.find().soorrt(soorrt).toArray();
+    const books = await booksAllll.find().sort(soorrt).toArray();
     res.send(books);
   } catch {
     res.status(500).send({ message: "Failed to fetch books" });
