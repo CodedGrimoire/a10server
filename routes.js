@@ -1,225 +1,35 @@
+// server.js
 import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import routes from "./routes.js";
+import { getDB } from "./db.js";
 
-import { ObjectId } from "mongodb";
+dotenv.config();
 
-const router = express.Router();
+const app = express();
 
-router.get("/all-books", async (req, res) => {
+app.use(cors());
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send("Book Haven backend is running");
+});
+
+app.get("/debug/db", async (req, res) => {
   try {
-    const db = req.app.locals.db;
-
-    const soorrt = {};
-    
-    const booksAllll = db.collection("books");
-
-    
-    if (req.query.soorrt === "rating-desc") 
-        {
-      soorrt.rating = -1;
-    } 
-    else if (req.query.soorrt === "rating-asc") {
-      soorrt.rating = 1;
-    } 
-    
-    else {
-      soorrt._id = -1;
-    }
-
-    const books = await booksAllll.find().sort(soorrt).toArray();
-    res.send(books);
-  } catch {
-    res.status(500).send({ message: "Failed to fetch books" });
+    const db = await getDB();
+    const count = await db.collection("books").countDocuments();
+    res.send({ ok: true, count });
+  } catch (err) {
+    res.status(500).send({ ok: false, error: err.message });
   }
 });
 
+app.use("/", routes);
 
+export default app;
 
-
-router.get("/book-details/:id", async (req, res) => {
-  try {
-    const db = req.app.locals.db;
-     const id = req.params.id;
-
-    const boookCol = db.collection("books");
-   
-
-    const book = await boookCol.findOne({ _id: new ObjectId(id) });
-    if (!book) {
-      return res.status(404).send({ message: "Book not found" });
-    }
-    res.send(book);
-  } 
-  
-  catch 
-  
-  {
-    res.status(500).send({ message: "Failed to fetch book details" });
-  }
-});
-
-
-
-
-router.get("/books/latest", async (req, res) => {
-  try 
-  {
-    const db = req.app.locals.db;
-     const booksCol = db.collection("books");
-
-      const books = await booksCol.find().sort({ _id: -1 }).limit(6).toArray();
-   
-  
-    res.send(books);
-  } catch 
-  {
-    res.status(500).send({ message: "Failed to fetch latest books" });
-  }
-});
-
-//boi add korbe
-
-
-router.post("/add-book", async (req, res) => {
-  try {
-    const db = req.app.locals.db;
-
-      const book = req.body;
-
-    const booksCol = db.collection("books");
-  
-    const required = ["title", "author",
-         "genre", "rating", "summary", "coverImage", "userEmail", "userName"];
-    
-         for (const field of required) {
-      if (!book[field]) {
-        return res.status(400).send({ message: `${field} is required` });
-      }
-    }
-
-    const result = await booksCol.insertOne(book);
-    res.send(result);
-  } 
-  catch 
-  
-  {
-    res.status(500).send({ message: "Failed to add book" });
-  }
-});
-
-
-//boi delte korbe
-router.delete("/delete-book/:id", async (req, res) => {
-  try {
-    const db = req.app.locals.db;
-    const booksCol = db.collection("books");
-
-
-    const id = req.params.id;
-
-    const result = await booksCol.deleteOne({ _id: new ObjectId(id) });
-
-
-    if (result.deletedCount === 0) {
-      return res.status(404).send({ message: "Book not found" });
-    }
-
-    res.send(result);
-  } 
-  
-  catch 
-  {
-    res.status(500).send({ message: "Failed to delete book" });
-  }
-
-
-});
-
-
-//top rating boi ber korbe
-router.get("/books/top-rated", async (req, res) => {
-  try {
-    const db = req.app.locals.db;
-
-const booksCol = db.collection("books");
-
-
-    const books = await booksCol.find().sort({ rating: -1 }).limit(3).toArray();
-
-    res.send(books);
-  } catch
-  
-  {
-    res.status(500).send({ message: "Failed to fetch top rated books" });
-  }
-
-
-});
-
-//books by email
-
-router.get("/myBooks", async (req, res) => {
-  try {
-    const email = req.query.email;
-
-
-    if (!email) 
-        {
-      return res.status(400).send({ message: "email query is required" });
-    }
-
-    const db = req.app.locals.db;
-
-
-    const booksCol = db.collection("books");
-
-const books = await booksCol.find({ userEmail: email }).toArray();
-
-    res.send(books);
-  } 
-  
-  catch 
-  
-  
-  {
-    res.status(500).send({ message: "Failed to fetch user books" });
-  }
-});
-
-
-//boi update korbe
-router.put("/update-book/:id", async (req, res) => {
-
-
-  try {
-    const db = req.app.locals.db;
-    const booksCol = db.collection("books");
-
-     const id = req.params.id;
-   
-    const payload = req.body;
-
-    const result = await booksCol.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: payload }
-    );
-
-    if (result.matchedCount === 0) 
-        
-    {
-      return res.status(404).send({ message: "Book not found" });
-    }
-
-    res.send(result);
-
-
-  }
-  
-  catch 
-  
-  {
-    res.status(500).send({ message: "Failed to update book" });
-  }
-});
-
-
-export default router;
+// for local
+ const port = 5001;
+ app.listen(port, () => console.log("running on", port));
