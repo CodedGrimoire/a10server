@@ -64,9 +64,10 @@ router.get("/books/latest", async (req, res) => {
   try 
   {
     const db = req.app.locals.db;
+     const booksCol = db.collection("books");
 
       const books = await booksCol.find().sort({ _id: -1 }).limit(6).toArray();
-    const booksCol = db.collection("books");
+   
   
     res.send(books);
   } catch 
