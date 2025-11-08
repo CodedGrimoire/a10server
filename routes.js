@@ -19,7 +19,7 @@ router.get("/all-books", async (req, res) => {
 
     const books = await booksCol.find().sort(sort).toArray();
     res.send(books);
-  } catch (err) {
+  } catch {
     res.status(500).send({ message: "Failed to fetch books" });
   }
 });
@@ -30,7 +30,7 @@ router.get("/books/latest", async (req, res) => {
     const booksCol = db.collection("books");
     const books = await booksCol.find().sort({ _id: -1 }).limit(6).toArray();
     res.send(books);
-  } catch (err) {
+  } catch {
     res.status(500).send({ message: "Failed to fetch latest books" });
   }
 });
@@ -46,7 +46,7 @@ router.get("/book-details/:id", async (req, res) => {
       return res.status(404).send({ message: "Book not found" });
     }
     res.send(book);
-  } catch (err) {
+  } catch {
     res.status(500).send({ message: "Failed to fetch book details" });
   }
 });
@@ -66,7 +66,7 @@ router.post("/add-book", async (req, res) => {
 
     const result = await booksCol.insertOne(book);
     res.send(result);
-  } catch (err) {
+  } catch {
     res.status(500).send({ message: "Failed to add book" });
   }
 });
@@ -88,7 +88,7 @@ router.put("/update-book/:id", async (req, res) => {
     }
 
     res.send(result);
-  } catch (err) {
+  } catch {
     res.status(500).send({ message: "Failed to update book" });
   }
 });
@@ -105,7 +105,7 @@ router.delete("/delete-book/:id", async (req, res) => {
     }
 
     res.send(result);
-  } catch (err) {
+  } catch {
     res.status(500).send({ message: "Failed to delete book" });
   }
 });
@@ -122,7 +122,7 @@ router.get("/myBooks", async (req, res) => {
 
     const books = await booksCol.find({ userEmail: email }).toArray();
     res.send(books);
-  } catch (err) {
+  } catch {
     res.status(500).send({ message: "Failed to fetch user books" });
   }
 });
@@ -133,7 +133,7 @@ router.get("/books/top-rated", async (req, res) => {
     const booksCol = db.collection("books");
     const books = await booksCol.find().sort({ rating: -1 }).limit(3).toArray();
     res.send(books);
-  } catch (err) {
+  } catch {
     res.status(500).send({ message: "Failed to fetch top rated books" });
   }
 });
