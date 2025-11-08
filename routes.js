@@ -184,4 +184,41 @@ const books = await booksCol.find({ userEmail: email }).toArray();
   }
 });
 
+
+//boi update korbe
+router.put("/update-book/:id", async (req, res) => {
+
+
+  try {
+    const db = req.app.locals.db;
+    const booksCol = db.collection("books");
+
+     const id = req.params.id;
+   
+    const payload = req.body;
+
+    const result = await booksCol.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: payload }
+    );
+
+    if (result.matchedCount === 0) 
+        
+    {
+      return res.status(404).send({ message: "Book not found" });
+    }
+
+    res.send(result);
+
+
+  }
+  
+  catch 
+  
+  {
+    res.status(500).send({ message: "Failed to update book" });
+  }
+});
+
+
 export default router;
