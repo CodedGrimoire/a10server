@@ -154,5 +154,34 @@ const booksCol = db.collection("books");
 
 });
 
+//books by email
+
+router.get("/myBooks", async (req, res) => {
+  try {
+    const email = req.query.email;
+
+
+    if (!email) 
+        {
+      return res.status(400).send({ message: "email query is required" });
+    }
+
+    const db = req.app.locals.db;
+
+
+    const booksCol = db.collection("books");
+
+const books = await booksCol.find({ userEmail: email }).toArray();
+
+    res.send(books);
+  } 
+  
+  catch 
+  
+  
+  {
+    res.status(500).send({ message: "Failed to fetch user books" });
+  }
+});
 
 export default router;
