@@ -75,7 +75,7 @@ router.get("/books/latest", async (req, res) => {
   }
 });
 
-
+//boi add korbe
 
 
 router.post("/add-book", async (req, res) => {
@@ -104,3 +104,55 @@ router.post("/add-book", async (req, res) => {
     res.status(500).send({ message: "Failed to add book" });
   }
 });
+
+
+//boi delte korbe
+router.delete("/delete-book/:id", async (req, res) => {
+  try {
+    const db = req.app.locals.db;
+    const booksCol = db.collection("books");
+
+
+    const id = req.params.id;
+
+    const result = await booksCol.deleteOne({ _id: new ObjectId(id) });
+
+
+    if (result.deletedCount === 0) {
+      return res.status(404).send({ message: "Book not found" });
+    }
+
+    res.send(result);
+  } 
+  
+  catch 
+  {
+    res.status(500).send({ message: "Failed to delete book" });
+  }
+
+
+});
+
+
+//top rating boi ber korbe
+router.get("/books/top-rated", async (req, res) => {
+  try {
+    const db = req.app.locals.db;
+
+const booksCol = db.collection("books");
+
+
+    const books = await booksCol.find().sort({ rating: -1 }).limit(3).toArray();
+
+    res.send(books);
+  } catch
+  
+  {
+    res.status(500).send({ message: "Failed to fetch top rated books" });
+  }
+
+
+});
+
+
+export default router;
