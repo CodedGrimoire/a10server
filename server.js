@@ -5,6 +5,7 @@ import express from "express";
 import cors from "cors";
 import { MongoClient, ServerApiVersion } from "mongodb";
 import routes from "./routes.js";
+import interactionRoutes from "./interaction.js";   // ← add this line
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,11 +38,14 @@ async function run() {
     const db = client.db("book_haven");
     app.locals.db = db;
 
+    // base route
     app.get("/", (req, res) => {
       res.send("Book Haven backend is running");
     });
 
-    app.use("/", routes);
+    // mount routes
+    app.use("/", routes);            // books
+    app.use("/", interactionRoutes); // comments  ← add this line
 
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
