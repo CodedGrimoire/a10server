@@ -1,43 +1,54 @@
-// interaction.js
+
 import express from "express";
 import { ObjectId } from "mongodb";
 
+
 const router = express.Router();
 
-/**
- * GET all comments for a specific book
- * GET /books/:bookId/comments
- */
+//boi er comment
+
+
 router.get("/books/:bookId/comments", async (req, res) => {
   try {
     const db = req.app.locals.db;
-    const commentsCol = db.collection("comments");
+
+
+    const comColection = db.collection("comments");
+
     const bookId = req.params.bookId;
 
-    const comments = await commentsCol
+    const comments = await comColection
       .find({ bookId: bookId })
       .sort({ createdAt: -1 })
       .toArray();
 
     res.send(comments);
-  } catch (err) {
+  } 
+  
+  
+  catch (err) 
+  
+  
+  {
     console.error("Failed to fetch comments:", err);
-    res.status(500).send({ message: "Failed to fetch comments" });
+
+    res.status(500).send({ message: "Failed to fetch comments..try again" });
   }
 });
 
-/**
- * CREATE a comment for a book
- * POST /comments
- * body: { bookId, userEmail, userName, comment }
- */
+//comment likuaaa
+
+
 router.post("/comments", async (req, res) => {
   try {
     const db = req.app.locals.db;
-    const commentsCol = db.collection("comments");
+
+    const comColection = db.collection("comments");
     const { bookId, userEmail, userName, comment } = req.body;
 
-    if (!bookId || !userEmail || !userName || !comment) {
+    if (!bookId || !userEmail || !userName || !comment) 
+      
+      {
       return res.status(400).send({
         message: "bookId, userEmail, userName and comment are required",
       });
@@ -51,31 +62,35 @@ router.post("/comments", async (req, res) => {
       createdAt: new Date(),
     };
 
-    const result = await commentsCol.insertOne(doc);
+    const result = await comColection.insertOne(doc);
     res.send(result);
-  } catch (err) {
+  } 
+  
+  catch (err)
+  
+  {
     console.error("Failed to create comment:", err);
-    res.status(500).send({ message: "Failed to create comment" });
+    res.status(500).send({ message: "Could not   create comment" });
   }
 });
 
-/**
- * UPDATE a comment
- * PUT /comments/:id
- * body: { comment: "new text" }
- */
+
+
+// cooment cng
 router.put("/comments/:id", async (req, res) => {
   try {
     const db = req.app.locals.db;
-    const commentsCol = db.collection("comments");
+    const comColection = db.collection("comments");
     const id = req.params.id;
     const { comment } = req.body;
 
-    if (!comment) {
+    if (!comment)
+      
+      {
       return res.status(400).send({ message: "comment is required" });
     }
 
-    const result = await commentsCol.updateOne(
+    const result = await comColection.updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
@@ -90,32 +105,43 @@ router.put("/comments/:id", async (req, res) => {
     }
 
     res.send(result);
-  } catch (err) {
+  } 
+  
+  
+  catch (err)
+  
+  {
     console.error("Failed to update comment:", err);
     res.status(500).send({ message: "Failed to update comment" });
   }
 });
 
-/**
- * DELETE a comment
- * DELETE /comments/:id
- */
+//deletiongg
+
+
 router.delete("/comments/:id", async (req, res) => {
   try {
     const db = req.app.locals.db;
-    const commentsCol = db.collection("comments");
+    const comColection = db.collection("comments");
     const id = req.params.id;
 
-    const result = await commentsCol.deleteOne({ _id: new ObjectId(id) });
+    const result = await comColection.deleteOne({ _id: new ObjectId(id) });
 
-    if (result.deletedCount === 0) {
+    if (result.deletedCount === 0)
+      
+      {
       return res.status(404).send({ message: "Comment not found" });
     }
 
     res.send(result);
-  } catch (err) {
+  } 
+  
+  catch (err) 
+  
+  
+  {
     console.error("Failed to delete comment:", err);
-    res.status(500).send({ message: "Failed to delete comment" });
+    res.status(500).send({ message: "Could not delete comment" });
   }
 });
 
